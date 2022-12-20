@@ -2,17 +2,13 @@ package t2s
 
 import (
 	"context"
-	//"fmt"
-	//"io/ioutil"
 	"log"
-	"os"
 
 	texttospeech "cloud.google.com/go/texttospeech/apiv1"
 	"cloud.google.com/go/texttospeech/apiv1/texttospeechpb"
 )
 
-func Text2Speech(text string) ([]byte, bool) {
-	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "/home/dgh_wood/key.json")
+func Text2Speech(text string) ([]byte, string, bool) {
 	// Instantiates a client.
 	ctx := context.Background()
 
@@ -46,12 +42,5 @@ func Text2Speech(text string) ([]byte, bool) {
 		log.Fatal(err)
 	}
 
-	// The resp's AudioContent is binary.
-	//filename := "output.mp3"
-	//err = ioutil.WriteFile(filename, resp.AudioContent, 0644)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//fmt.Printf("Audio content written to file: %v\n", filename)
-	return resp.AudioContent, false
+	return resp.AudioContent, "audio/mpeg", false
 }
