@@ -5,7 +5,6 @@ import (
 	parse "github.com/dghwood/webpod/parse"
 	storage "github.com/dghwood/webpod/storage"
 	t2s "github.com/dghwood/webpod/t2s"
-	"log"
 	"time"
 )
 
@@ -19,16 +18,24 @@ type URL2PodResponse struct {
 	ArticleURL string        `json:"article_url"`
 	Article    parse.Article `json:"article"`
 	AudioURL   string        `json:"audio_url"`
+	Error      bool          `json:"error"`
 }
 
 func URL2Pod(request URL2PodRequest) (URL2PodResponse, bool) {
 
 	resp := URL2PodResponse{ArticleURL: request.URL}
 	resp.Timestamp = request.Timestamp
-	article, _ := parse.ParseArticle(request.URL)
+	article, err := parse.ParseArticle(request.URL)
+	if err {
+		resp.Error = true
+		return resp, true
+	}
 	resp.Article = article
-	log.Println("HELLO", len(article.Text))
-	audio, fileExtension, _ := t2s.Text2SpeechLong(article.Text)
+	audio, fileExtension, err := t2s.Text2SpeechLong(article.Text)
+	if err {
+		resp.Error = true
+		return resp, true
+	}
 	fileName := b64.StdEncoding.EncodeToString([]byte(request.URL)) + fileExtension
 	audioURL := storage.Store(audio, fileName)
 	resp.AudioURL = audioURL

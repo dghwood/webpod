@@ -41,3 +41,11 @@ func TestArticleNoNewLines(t *testing.T) {
 	}
 	os.WriteFile("../samples/test_article_no_new_lines.txt", []byte(article.Text), 0644)
 }
+
+func TestNonURL(t *testing.T) {
+	url := "asdasda"
+	article, err := ParseArticle(url)
+	if !err {
+		t.Error("Should error out", article)
+	}
+}

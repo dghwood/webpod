@@ -18,7 +18,7 @@ func ParseArticle(url string) (Article, bool) {
 	article, err := readability.FromURL(url, 30*time.Second)
 	if err != nil {
 		//log.Info("failed to parse %s, %v\n", url, err)
-		return Article{}, false
+		return Article{}, true
 	}
 	return Article{
 		Title:    article.Title,
