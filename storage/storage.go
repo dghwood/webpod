@@ -9,7 +9,7 @@ import (
 
 const bucketName = "bsnek-316609.appspot.com"
 
-func Store(fileBytes []byte, fileName string, contentType string) string {
+func Store(fileBytes []byte, fileName string) string {
 	ctx := context.Background()
 
 	// Creates a client.
@@ -32,12 +32,6 @@ func Store(fileBytes []byte, fileName string, contentType string) string {
 	acl := obj.ACL()
 	// TODO: check errors
 	acl.Set(ctx, storage.AllUsers, storage.RoleReader)
-	// TODO: check errors
-	obj.Update(ctx, storage.ObjectAttrsToUpdate{
-		Metadata: map[string]string{
-			"Content-Type": contentType,
-		},
-	})
 
 	return fmt.Sprintf("https://storage.googleapis.com/%s/%s", bucketName, fileName)
 }
