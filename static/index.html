@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>WebPod</title>
+  </head>
+  <body>
+    <header>
+      <div class="logo">WebPod</div>
+    </header>
+    <views>
+      <view id="view-pod-list" >
+        <template id="pod-domain-item">
+          <div class="pod-domain">
+            <div class="pod-domain-icon">
+
+            </div>
+          </div>
+        </template>
+        <section id="pod-domains">
+
+        </section>
+        <template id="pod-list-item">
+          <div class="pod">
+            <div class="pod-header">
+              <div class="pod-header-icon"></div>
+              <div class="pod-header-body">
+                <div class="pod-header-title">domain.com</div>
+                <div class="pod-header-timestamp">10mins ago</div>
+              </div>
+            </div>
+            <div class="pod-body">
+              <div class="pod-body-header">In French we trust</div>
+              <div class="pod-body-text">Really long except of text that continues, Really long except of text that continues, Really long except of text that continues, Really long except of text that continues, Really long except of text that continues, Really long except of text that continues, Really long except of text that continues, Really long except of text that continues</div>
+            </div>
+            <div class="pod-footer">
+              <div class="pod-actions">
+                <div class="pod-action play"></div>
+                <div class="pod-action delete"></div>
+                <div class="pod-action share"></div>
+              </div>
+            </div>
+          </div>
+        </template>
+        <section id="pod-list">
+          
+
+          <style>
+            body, html {
+              padding: 0px; 
+              margin: 0px; 
+              font-family: monospace;
+            }
+            header {
+              display: flex;
+              padding: 10px; 
+              background-color: rgb(235, 235, 235); 
+            }
+            header .logo {
+              text-transform: uppercase; 
+              font-size: 1.2em;
+              text-align: center; 
+              flex: auto; 
+            }
+            views {
+              display: block; 
+              padding: 0px 10px; 
+            }
+            views view {
+              display: block; 
+            }
+            #pod-domains {
+              display: flex; 
+              width: 100%; 
+              overflow: hidden; 
+              border-bottom: 1px solid rgb(235, 235, 235);
+            }
+            #pod-domains .pod-domain {
+              display: block; 
+              flex: none;
+              height: 75px; 
+              width: 75px;
+              background-color: rgb(235, 235, 235);
+              margin: 10px;  
+              background-size: cover;               
+            }
+            #pod-domains .pod-domain .pod-domain-text {
+              text-align: center;
+              width: 100%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              bottom: 0px; 
+            }
+            .pod {
+              padding: 10px; 
+              _border-top: 1px solid rgb(235, 235, 235); 
+              border-bottom: 1px solid rgb(235, 235, 235);
+            }
+            .pod .pod-header {
+              display: flex;
+              padding: 5px; 
+            }
+            .pod .pod-header .pod-header-icon {
+              height: 40px; 
+              width: 40px; 
+              margin: 0px 10px; 
+              background-color: rgb(235, 235, 235);
+              background-size: cover;
+            }
+            .pod .pod-header .pod-header-body {
+              flex: auto; 
+            }
+            .pod .pod-body {
+              margin: 0px 10px; 
+              padding: 5px; 
+            }
+            .pod .pod-body .pod-body-header {
+              font-weight: bold; 
+            }
+            .pod .pod-body .pod-body-text {
+              max-height: 40px; 
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+            }
+            .pod .pod-actions {
+              display: flex; 
+              padding: 5px; 
+            }
+            .pod .pod-actions .pod-action {
+              background-color: rgb(235, 235, 235); 
+              height: 20px; 
+              width: 20px; 
+              margin: 0px 10px;               
+            }
+          </style>
+        </section>
+      </view>
+      <view id="view-add-pod">
+        <div class="pod-add"></div>
+        <div class="add-pod-close"></div>
+        <div class="pod-add-pop">
+          <div class="pod-add-form">
+            <input type="text" placeholder="enter article url"/>
+            <button type="button">Go</button>
+          </div>
+        </div>
+      </view>
+      <style>
+        .pod-add {
+          position: absolute; 
+          bottom: 50px; 
+          right: 30px;
+          border-radius: 10000px; 
+          background-color: rgb(235, 235, 235); 
+          height: 50px;
+          width: 50px;
+        }
+        .add-pod-close {
+          position: absolute;
+          _display: none;
+          top: 0px; 
+          bottom: 0px; 
+          left: 0px; 
+          right: 0px;
+          background-color: rgba(12, 12, 12, 0.7);
+        }
+        .pod-add-pop {
+          position: absolute;
+          bottom: 0px;
+          height: 300px;
+          left: 0px;
+          right: 0px;
+          background: white;
+          border-radius: 20px;
+          padding: 20px;
+
+          transition: bottom 0.5s          
+        }
+        .pod-add-pop .pod-add-form {
+          display: flex;          
+        }
+        .pod-add-pop .pod-add-form input {
+          flex: auto;
+        }
+        input {
+          outline: none;
+          border: 1px solid rgb(235, 235, 235);
+          font-family: inherit;
+          border-radius: 2px;
+        }
+        input:focus {
+          border-color: rgb(180, 180, 180);
+        }
+        button {
+          outline: none;
+          background-color: rgb(235, 235, 235);
+          border-radius: 2px;
+          border: none;
+          font-family: inherit;
+          text-transform: uppercase;
+          padding: 7px 20px;
+        }
+
+        
+      </style>
+      <view id="view-pod-play">
+        <div class="player-close"></div>
+        <div class="player close">
+          <div class="player-image">
+
+          </div>
+          <div class="player-header">
+            <div class="player-header-icon"></div>
+            <div class="player-header-title">Some Title</div>
+          </div>
+          <div class="player-controls">
+            <audio controls></audio>
+          </div>
+        </div>
+      </view>
+      <style>
+        #_view-pod-play {
+          display: none;
+          position: absolute; 
+          bottom: 0px; 
+          top: 0px; 
+          left: 0px; 
+          right: 0px;  
+          background-color: rgba(12, 12, 12, 0.6);
+        }
+        #view-pod-play .player-close{
+          position: absolute;
+          display: none;
+          top: 0px; 
+          bottom: 0px; 
+          left: 0px; 
+          right: 0px;
+          background-color: rgba(12, 12, 12, 0.7);
+        }
+        #view-pod-play .player {
+          position: absolute;
+          bottom: 0px;
+          height: 500px;
+          left: 0px;
+          right: 0px;
+          background: white;
+          border-radius: 20px;
+          padding: 20px;
+
+          transition: bottom 0.5s
+        }
+        #view-pod-play .player.close {
+          bottom: -600px;
+        }
+        #view-pod-play .player .player-image {
+          padding: 10px;
+          background-color: rgb(235, 235, 235);
+          height: 300px;
+          margin: auto;
+          background-size: cover;
+          border-radius: 10px;
+        }
+        #view-pod-play .player .player-header {
+          display: flex; 
+          margin: 10px 0px;
+          align-items: center;
+        }
+        #view-pod-play .player .player-header .player-header-title {
+          flex: auto; 
+          padding: 0px 10px; 
+        }
+        #view-pod-play .player .player-header .player-header-icon {
+          padding: 10px; 
+          width: 40px; 
+          height: 40px; 
+          background-color: rgb(235, 235, 235);
+          background-size: cover; 
+        }
+        #view-pod-play .player .player-controls {
+          text-align: center;
+          padding-top: 20px;
+        }
+        #view-pod-play .player .player-controls audio {
+          width: 100%;
+        }
+      </style>
+      
+    </views>
+    <button>Submit</button>
+  </body>
+</html>
+
+<script src="/static/js/main.js"></script>
+<style>
+  .play {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="48" width="48"><path d="M19.15 32.5 32.5 24l-13.35-8.5ZM24 44q-4.1 0-7.75-1.575-3.65-1.575-6.375-4.3-2.725-2.725-4.3-6.375Q4 28.1 4 24q0-4.15 1.575-7.8 1.575-3.65 4.3-6.35 2.725-2.7 6.375-4.275Q19.9 4 24 4q4.15 0 7.8 1.575 3.65 1.575 6.35 4.275 2.7 2.7 4.275 6.35Q44 19.85 44 24q0 4.1-1.575 7.75-1.575 3.65-4.275 6.375t-6.35 4.3Q28.15 44 24 44Zm0-3q7.1 0 12.05-4.975Q41 31.05 41 24q0-7.1-4.95-12.05Q31.1 7 24 7q-7.05 0-12.025 4.95Q7 16.9 7 24q0 7.05 4.975 12.025Q16.95 41 24 41Zm0-17Z"/></svg>');
+    background-size: cover; 
+  }
+</style>
