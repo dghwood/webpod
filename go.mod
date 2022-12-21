@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go/storage v1.28.1
 	cloud.google.com/go/texttospeech v1.5.0
 	github.com/go-shiori/go-readability v0.0.0-20220215145315-dd6828d2f09b
+	github.com/moutend/go-wav v0.0.0-20170820031854-56127fbbb7ba
 )
 
 require (
