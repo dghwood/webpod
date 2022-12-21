@@ -9,7 +9,7 @@ func TestText2SpeechLong(t *testing.T) {
 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "/home/dgh_wood/key.json")
 	buffer := ""
 	for i := 0; i < 100; i++ {
-		buffer += "hello hello hello hello hello hello hello hello hello\n"
+		buffer += "hello hello hello hello hello hello hello hello hello" + splitChar
 	}
 	if len(buffer) < 5000 {
 		t.Error("buffer is too short to split", len(buffer))
@@ -34,13 +34,12 @@ three`
 	if len(result) != 2 {
 		t.Error("splitText returned the wrong number of splits")
 	}
-
 }
 
 func TestSplitTextLong(t *testing.T) {
 	buffer := ""
 	for i := 0; i < 100; i++ {
-		buffer += "hello hello hello hello hello hello hello hello hello\n"
+		buffer += "hello hello hello hello hello hello hello hello hello" + splitChar
 	}
 	result, err := splitText(buffer, 5000)
 	if err != nil {
@@ -48,5 +47,16 @@ func TestSplitTextLong(t *testing.T) {
 	}
 	if len(result) != 2 {
 		t.Error("splitText returned wrong number of splits")
+	}
+}
+
+func TestSplitTextNoNewLines(t *testing.T) {
+	text, err := os.ReadFile("../samples/test_article_no_new_lines.txt")
+	if err != nil {
+		t.Error("failed to read file")
+	}
+	result, err := splitText(string(text), 5000-1)
+	if err != nil {
+		t.Error("failed to split", result)
 	}
 }

@@ -1,7 +1,7 @@
 package parse
 
 import (
-	//"fmt"
+	"os"
 	"testing"
 )
 
@@ -22,4 +22,22 @@ func TestArticle(t *testing.T) {
 	if article.ImageURL != "https://www.economist.com/img/b/1280/720/90/media-assets/image/20221217_LDP503.jpg" {
 		t.Error("imageURL failed to parse")
 	}
+}
+
+func TestArticleLong(t *testing.T) {
+	url := "https://www.adexchanger.com/commerce/more-performance-less-transparency-inside-metas-advantage-shopping-black-box/"
+	_, err := ParseArticle(url)
+	if err {
+		t.Error("failed to parse URL ", url)
+	}
+	//t.Error(len(article.Text))
+}
+
+func TestArticleNoNewLines(t *testing.T) {
+	url := "https://www.theguardian.com/commentisfree/2022/dec/21/politicians-candidates-tax-returns-mandatory-congress-stocks"
+	article, err := ParseArticle(url)
+	if err {
+		t.Error("failed to parse URL ", url)
+	}
+	os.WriteFile("../samples/test_article_no_new_lines.txt", []byte(article.Text), 0644)
 }

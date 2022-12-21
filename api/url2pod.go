@@ -2,10 +2,10 @@ package api
 
 import (
 	b64 "encoding/base64"
-
 	parse "github.com/dghwood/webpod/parse"
 	storage "github.com/dghwood/webpod/storage"
 	t2s "github.com/dghwood/webpod/t2s"
+	"log"
 )
 
 type URL2PodRequest struct {
@@ -23,7 +23,7 @@ func URL2Pod(request URL2PodRequest) (URL2PodResponse, bool) {
 
 	article, _ := parse.ParseArticle(request.URL)
 	resp.Article = article
-
+	log.Println("HELLO", len(article.Text))
 	audio, fileExtension, _ := t2s.Text2SpeechLong(article.Text)
 	fileName := b64.StdEncoding.EncodeToString([]byte(request.URL)) + fileExtension
 	audioURL := storage.Store(audio, fileName)

@@ -3,7 +3,7 @@ package t2s
 import (
 	"context"
 	"errors"
-	"fmt"
+
 	wav "github.com/moutend/go-wav"
 	"io"
 	"log"
@@ -70,13 +70,18 @@ func Text2Speech(text string) ([]byte, string, bool) {
 	return resp.AudioContent, ".mp3", false
 }
 
+/* Split text by , since that makes sense right? */
+const splitChar = ","
+
 func splitText(text string, limit int) ([]string, error) {
-	lines := strings.Split(text, "\n")
+	lines := strings.Split(text, splitChar)
 	returnStrings := make([]string, 0)
 	buffer := ""
 	for _, line := range lines {
-		line += "\n"
-		if len(buffer)+len(line) < limit {
+		line += splitChar
+		if len(line) >= limit {
+			return nil, errors.New("text unable to be split into requests")
+		} else if len(buffer)+len(line) < limit {
 			buffer += line
 		} else {
 			returnStrings = append(returnStrings, buffer)
@@ -84,6 +89,7 @@ func splitText(text string, limit int) ([]string, error) {
 		}
 	}
 	if len(buffer) > limit {
+		log.Println("text unable to be split into requests")
 		return nil, errors.New("text unable to be split into requests")
 	}
 	returnStrings = append(returnStrings, buffer)
@@ -91,6 +97,7 @@ func splitText(text string, limit int) ([]string, error) {
 }
 
 func Text2SpeechLong(text string) ([]byte, string, bool) {
+	log.Println("Text2SpeechLong")
 	// Instantiates a client.
 	ctx := context.Background()
 
@@ -102,12 +109,13 @@ func Text2SpeechLong(text string) ([]byte, string, bool) {
 	defer client.Close()
 
 	texts, _ := splitText(text, 5000-1)
-	fmt.Println(len(texts))
+	log.Println("TextSplit #", len(texts))
 
 	files := make([]wav.File, len(texts))
 
 	// Run each text piece via T2S
 	for i := 0; i < len(texts); i++ {
+		log.Println("T2S for text:", len(texts[i]))
 		req := buildWAVRequest(texts[i])
 		resp, err := client.SynthesizeSpeech(ctx, &req)
 		if err != nil {
