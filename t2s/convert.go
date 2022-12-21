@@ -67,7 +67,7 @@ func Text2Speech(text string) ([]byte, string, bool) {
 		log.Fatal(err)
 	}
 
-	return resp.AudioContent, "audio/mpeg", false
+	return resp.AudioContent, ".mp3", false
 }
 
 func splitText(text string, limit int) ([]string, error) {
@@ -122,5 +122,5 @@ func Text2SpeechLong(text string) ([]byte, string, bool) {
 	}
 	audioContent, _ := wav.Marshal(content)
 
-	return audioContent, "audio/wav", false
+	return audioContent, ".wav", false
 }
