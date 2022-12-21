@@ -24,11 +24,9 @@ func URL2Pod(request URL2PodRequest) (URL2PodResponse, bool) {
 	article, _ := parse.ParseArticle(request.URL)
 	resp.Article = article
 
-	audio, mimeType, _ := t2s.Text2Speech(article.Text)
-	// TODO: Need to sort out mimeType vs fileExtension
-	// Seems like I need .mp3 otherwise Chrome won't play it.
-	fileName := b64.StdEncoding.EncodeToString([]byte(request.URL)) + ".mp3"
-	audioURL := storage.Store(audio, fileName, mimeType)
+	audio, fileExtension, _ := t2s.Text2SpeechLong(article.Text)
+	fileName := b64.StdEncoding.EncodeToString([]byte(request.URL)) + fileExtension
+	audioURL := storage.Store(audio, fileName)
 	resp.AudioURL = audioURL
 
 	return resp, false
