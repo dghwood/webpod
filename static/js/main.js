@@ -23,8 +23,21 @@ webpod.audio.src = function(pod) {
     return;
   }
   this._element.src = url;
-  this._src = pod; 
-  this.seek(pod.seconds());
+  /* check the cache 
+     clean this up
+  */
+  var reject = function() {
+    this._element.src = url;
+    this.seek(pod.seconds());
+  }.bind(this); 
+  var resolve = function(blob_url) {
+    this._element.src = blob_url;
+    this.seek(pod.seconds());
+  }.bind(this); 
+  webpod.storage.cache.match(url)
+  .then(x => x.blob(), reject)
+  .then(URL.createObjectURL)
+  .then(resolve, reject);
 };
 webpod.audio.play = function() {
   this._element.play();
@@ -190,6 +203,16 @@ webpod.storage.table.pods = function() {
 /* Wrapper around window.caches */
 webpod.register_namespace("webpod.storage.cache");
 webpod.storage.cache._NAME_ = 'v1'; 
+webpod.storage.cache.match = async function(url) {
+  return new Promise(function(resolve, reject) {
+    if (!window.caches) {
+      reject(); 
+    }
+    window.caches.open(webpod.storage.cache._NAME_)
+      .then(cache => cache.match(url))
+      .then(resolve, reject);
+  });  
+};
 webpod.storage.cache.add = async function(url) {
   return new Promise(function(resolve, reject) {
     if (!window.caches) {
@@ -221,6 +244,12 @@ webpod.model.pod.prototype.pod_key = function() {
 };
 webpod.model.pod.prototype.audio_url = function() {
   return this._data['audio_url'];
+};
+webpod.model.pod.prototype.duration = function() {
+  return this._data['duration'] ? this._data['duration'] : ''
+}
+webpod.model.pod.prototype.article_url = function() {
+  return this._data['article_url'];
 };
 webpod.model.pod.prototype.seconds = function() {
   return this._data['seconds_played'] ? this._data['seconds_played'] : 0;
@@ -262,6 +291,31 @@ webpod.model.pod.prototype.save = async function() {
       .then( x => resolve(), x => reject());
   });
 };
+webpod.model.pod.prototype.is_downloaded = function() {
+  return this._data['is_downloaded'] ? true : false; 
+};
+webpod.model.pod.prototype.undownload = async function() {
+  var self = this; 
+  return new Promise(function(resolve, reject) {
+    webpod.storage.cache.delete(self.audio_url())
+      .then(function() {
+        self._data['is_downloaded'] = false; 
+        self.save().then(resolve, reject);
+      }, reject);
+  });
+};
+webpod.model.pod.prototype.download = async function() {
+  var self = this;
+  /* what about the images, they should be cached elsewhere */  
+  return new Promise(function(resolve, reject) { 
+    webpod.storage.cache.add(self.audio_url())
+      .then(function() {
+        self._data['is_downloaded'] = true; 
+        self.save().then(resolve, reject);
+      }, reject)
+  });
+};
+
 /* API 
 
 
@@ -309,8 +363,18 @@ webpod.ui.template.pod_item = function(pod) {
   template.querySelector('.pod-body-header').textContent = pod.title();
   template.querySelector('.pod-body-text').textContent = pod.text(); 
   template.querySelector('.pod-header-icon').style.backgroundImage = 'url(' + pod.icon_url() + ')';
+  template.querySelector('.duration').textContent = parseInt(pod.duration()/60) + ' mins'; 
   template.querySelector('.pod-header-timestamp')
     .textContent = webpod.utils.time.simplify(pod.timestamp());
+  if (pod.is_downloaded()) {
+    template.querySelector('.pod-action.download').classList.add('hidden')
+    template.querySelector('.pod-action.undownload').classList.remove('hidden');
+  } else {
+    template.querySelector('.pod-action.download').classList.remove('hidden')
+    template.querySelector('.pod-action.undownload').classList.add('hidden');
+  }
+  //
+  template.querySelector('.open-url').href = pod.article_url(); 
   return template;
 };
 webpod.ui.template.subscription = function(pod) {
@@ -330,22 +394,37 @@ webpod.ui.pods.urlform.open = function() {
   document.querySelector('.add-pod-close').style.display = 'block'; 
   document.querySelector('.pod-add-pop').classList.remove('closed');
   document.querySelector('.add-pod-close').onclick = webpod.ui.pods.urlform.close
-  document.querySelector('.pod-add-form form').onsubmit = webpod.ui.pods.urlform._onsubmit; 
+  document.querySelector('.pod-add-form form').onsubmit = webpod.ui.pods.urlform._onsubmit;
+  
+  webpod.ui.pods.urlform.showmessage(-1);
 };
 webpod.ui.pods.urlform._onsubmiterror = function() {
   console.log("ERROR submitting form");
   webpod.ui.pods.urlform._onsubmitfinish(); 
+  webpod.ui.pods.urlform.showmessage(2);
+  document.querySelector('.pod-form-message.error').classList.remove('hidden');
 }
 webpod.ui.pods.urlform._onsubmitfinish = function() {
   document.querySelector('.pod-add-form form button[type="submit"]').removeAttribute('disabled');  
   document.querySelector('.pod-add-form form input').value = '';
+  webpod.ui.pods.urlform.showmessage(1);
 }
+webpod.ui.pods.urlform.showmessage = function(e) {
+  document.querySelectorAll('.pod-form-message').forEach(x => x.classList.add('hidden'));
+  switch(e) {
+    case 1: document.querySelector('.pod-form-message.success').classList.remove('hidden'); break;
+    case 2: document.querySelector('.pod-form-message.error').classList.remove('hidden'); break;
+    case 3: document.querySelector('.pod-form-message.loading').classList.remove('hidden'); break;
+  }
+};
 webpod.ui.pods.urlform._onsubmit = function(e) {
   e.preventDefault();
   var input = e.target.querySelector('input'); 
   var submit = e.target.querySelector('button[type="submit"]'); 
   submit.setAttribute('disabled', 'disabled'); 
   var url = input.value; 
+
+  webpod.ui.pods.urlform.showmessage(3);
   webpod.server.api.url2pod({'url': url, 'timestamp': new Date()})
   .then(function(pod) {
     pod.save().then(function(){
@@ -370,6 +449,19 @@ webpod.ui.pods.item = function(pod) {
   this.element.querySelector('.delete').onclick = function(e) {
     e.preventDefault();
     this.pod.delete().then(x => webpod.ui.pods.list(), x => console.log('delete error') /* handle error */);
+  }.bind(this);
+
+  this.element.querySelector('.download').onclick = function(e) {
+    this.pod.download().then(function() {
+      this.element.querySelector('.download').classList.add('hidden'); 
+      this.element.querySelector('.undownload').classList.remove('hidden');
+    }.bind(this));
+  }.bind(this);
+  this.element.querySelector('.undownload').onclick = function(e) {
+    this.pod.undownload().then(function() {
+      this.element.querySelector('.download').classList.remove('hidden'); 
+      this.element.querySelector('.undownload').classList.add('hidden');
+    }.bind(this));
   }.bind(this);
 };
 webpod.ui.pods.item.prototype.updatetime = function(seconds_played, duration) {
@@ -401,28 +493,7 @@ webpod.ui.pods.list = function() {
       webpod.ui.pods.subscription(subs);
     });
     
-  /* webpod.storage.table.pods()
-    .then(function(db) {
-      db.list().then(
-        function(responses) {
-     
-          //responses.sort((a, b) =>  console.log(a, b); new Date(a['timestamp']) - new Date(b['timestamp']) > 0);
-          responses.sort(function(a, b) {
-            return new Date(b['timestamp']) - new Date(a['timestamp']);
-          })
-          var subscriptions = {}; 
-          // TODO: Assuming this orders them from most recent?
-          for (var i = 0; i < responses.length; i++) {
-            var response = responses[i];
-            var pod = new webpod.model.pod(response);
-            new webpod.ui.pods.item(pod); 
-            subscriptions[response['article']['site_name']] = pod; 
-          } 
-          
-          webpod.ui.pods.subscription(subscriptions)
-        }
-      )
-  }); */
+  
 };
 
 
