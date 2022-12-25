@@ -96,7 +96,14 @@ func splitText(text string, limit int) ([]string, error) {
 	return returnStrings, nil
 }
 
-func Text2SpeechLong(text string) ([]byte, string, bool) {
+type Text2SpeechResponse struct {
+	Duration      float32
+	FileExtension string
+	AudioBytes    []byte
+}
+
+func Text2SpeechLong(text string) (Text2SpeechResponse, bool) {
+	resp := Text2SpeechResponse{}
 	log.Println("Text2SpeechLong")
 	// Instantiates a client.
 	ctx := context.Background()
@@ -114,6 +121,7 @@ func Text2SpeechLong(text string) ([]byte, string, bool) {
 	files := make([]wav.File, len(texts))
 
 	// Run each text piece via T2S
+	// do this concurrently
 	for i := 0; i < len(texts); i++ {
 		log.Println("T2S for text:", len(texts[i]))
 		req := buildWAVRequest(texts[i])
@@ -128,7 +136,12 @@ func Text2SpeechLong(text string) ([]byte, string, bool) {
 	for i := 0; i < len(texts); i++ {
 		io.Copy(content, &files[i])
 	}
-	audioContent, _ := wav.Marshal(content)
+	resp.FileExtension = "wav"
 
-	return audioContent, ".wav", false
+	audioContent, _ := wav.Marshal(content)
+	resp.AudioBytes = audioContent
+	// built in content.Duration is broken
+	duration := float32(content.Length()) * 1. / float32(content.BlockAlign()) * 1. / float32(content.SamplesPerSec())
+	resp.Duration = duration
+	return resp, false
 }

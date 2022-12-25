@@ -14,13 +14,13 @@ func TestText2SpeechLong(t *testing.T) {
 	if len(buffer) < 5000 {
 		t.Error("buffer is too short to split", len(buffer))
 	}
-	audioBytes, _, err := Text2SpeechLong(buffer)
+	resp, err := Text2SpeechLong(buffer)
 	if err {
 		t.Error("Text2Speech throws error")
 	}
 
 	// download the file for testing
-	os.WriteFile("testtext2speechlong.wav", audioBytes, 0644)
+	os.WriteFile("testtext2speechlong.wav", resp.AudioBytes, 0644)
 }
 
 func TestSplitText(t *testing.T) {
