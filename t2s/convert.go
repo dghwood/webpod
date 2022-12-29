@@ -102,15 +102,15 @@ type Text2SpeechResponse struct {
 	AudioBytes    []byte
 }
 
-func Text2SpeechLong(text string) (Text2SpeechResponse, bool) {
-	resp := Text2SpeechResponse{}
-	log.Println("Text2SpeechLong")
+func Text2SpeechLong(text string) (resp Text2SpeechResponse, err error) {
+	resp = Text2SpeechResponse{}
+
 	// Instantiates a client.
 	ctx := context.Background()
 
 	client, err := texttospeech.NewClient(ctx)
 	if err != nil {
-		log.Fatal(err)
+		return resp, err
 	}
 
 	defer client.Close()
@@ -125,11 +125,11 @@ func Text2SpeechLong(text string) (Text2SpeechResponse, bool) {
 	for i := 0; i < len(texts); i++ {
 		log.Println("T2S for text:", len(texts[i]))
 		req := buildWAVRequest(texts[i])
-		resp, err := client.SynthesizeSpeech(ctx, &req)
+		r, err := client.SynthesizeSpeech(ctx, &req)
 		if err != nil {
-			log.Fatal(err)
+			return resp, err
 		}
-		wav.Unmarshal(resp.AudioContent, &files[i])
+		wav.Unmarshal(r.AudioContent, &files[i])
 	}
 	// Then concat the files into one
 	content, _ := wav.New(files[0].SamplesPerSec(), files[0].BitsPerSample(), files[0].Channels())
@@ -143,5 +143,5 @@ func Text2SpeechLong(text string) (Text2SpeechResponse, bool) {
 	// built in content.Duration is broken
 	duration := float32(content.Length()) * 1. / float32(content.BlockAlign()) * 1. / float32(content.SamplesPerSec())
 	resp.Duration = duration
-	return resp, false
+	return resp, nil
 }

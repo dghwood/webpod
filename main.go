@@ -8,13 +8,25 @@ import (
 	"os"
 )
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 // TODO: Move this to api?
 func HandleURL2Pod(w http.ResponseWriter, r *http.Request) {
 	request := api.URL2PodRequest{}
 	json.NewDecoder(r.Body).Decode(&request)
-	response, _ := api.URL2Pod(request)
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(response)
+	response, err := api.URL2Pod(request)
+	if err != nil {
+		eResp := ErrorResponse{err.Error()}
+		err = json.NewEncoder(w).Encode(eResp)
+		if err != nil {
+			log.Printf("ERROR: Failed to encode info response, %s", err)
+		}
+		return
+	}
+	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
 		log.Printf("ERROR: Failed to encode info response, %s", err)
 	}

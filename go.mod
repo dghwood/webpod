@@ -6,7 +6,9 @@ require (
 	cloud.google.com/go/storage v1.28.1
 	cloud.google.com/go/texttospeech v1.5.0
 	github.com/go-shiori/go-readability v0.0.0-20220215145315-dd6828d2f09b
+	github.com/google/martian/v3 v3.2.1
 	github.com/moutend/go-wav v0.0.0-20170820031854-56127fbbb7ba
+	golang.org/x/net v0.0.0-20221014081412-f15817d10f9b
 )
 
 require (
@@ -25,7 +27,6 @@ require (
 	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/net v0.0.0-20221014081412-f15817d10f9b // indirect
 	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783 // indirect
 	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
 	golang.org/x/text v0.5.0 // indirect

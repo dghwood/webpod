@@ -10,7 +10,10 @@ import (
 func TestStorage(t *testing.T) {
 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "/home/dgh_wood/key.json")
 	fileContents := []byte("HELLO")
-	url := Store(fileContents, "test2.txt")
+	url, err := Store(fileContents, "test2.txt")
+	if err != nil {
+		t.Error(err)
+	}
 	resp, err := http.Get(url)
 	if err != nil {
 		t.Error("http failed", err)

@@ -10,7 +10,7 @@ func TestArticle(t *testing.T) {
 	url := "https://www.economist.com/leaders/2022/12/15/the-french-exception"
 	//url = "https://www.nytimes.com/2022/12/16/us/politics/justice-eastman-trump-lawyers-fake-electors.amp.html"
 	article, err := ParseArticle(url)
-	if err {
+	if err != nil {
 		t.Error("failed to parse URL")
 	}
 	if article.Title != "The French exception" {
@@ -27,16 +27,15 @@ func TestArticle(t *testing.T) {
 func TestArticleLong(t *testing.T) {
 	url := "https://www.adexchanger.com/commerce/more-performance-less-transparency-inside-metas-advantage-shopping-black-box/"
 	_, err := ParseArticle(url)
-	if err {
+	if err != nil {
 		t.Error("failed to parse URL ", url)
 	}
-	//t.Error(len(article.Text))
 }
 
 func TestArticleNoNewLines(t *testing.T) {
 	url := "https://www.theguardian.com/commentisfree/2022/dec/21/politicians-candidates-tax-returns-mandatory-congress-stocks"
 	article, err := ParseArticle(url)
-	if err {
+	if err != nil {
 		t.Error("failed to parse URL ", url)
 	}
 	os.WriteFile("../samples/test_article_no_new_lines.txt", []byte(article.Text), 0644)
@@ -45,7 +44,7 @@ func TestArticleNoNewLines(t *testing.T) {
 func TestNonURL(t *testing.T) {
 	url := "asdasda"
 	article, err := ParseArticle(url)
-	if !err {
+	if err == nil {
 		t.Error("Should error out", article)
 	}
 }

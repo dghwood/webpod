@@ -15,7 +15,7 @@ func TestText2SpeechLong(t *testing.T) {
 		t.Error("buffer is too short to split", len(buffer))
 	}
 	resp, err := Text2SpeechLong(buffer)
-	if err {
+	if err != nil {
 		t.Error("Text2Speech throws error")
 	}
 

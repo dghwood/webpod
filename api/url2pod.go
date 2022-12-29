@@ -19,28 +19,30 @@ type URL2PodResponse struct {
 	Article    parse.Article `json:"article"`
 	AudioURL   string        `json:"audio_url"`
 	Duration   float32       `json:"duration"`
-	Error      bool          `json:"error"`
 }
 
-func URL2Pod(request URL2PodRequest) (URL2PodResponse, bool) {
-
-	resp := URL2PodResponse{ArticleURL: request.URL}
+func URL2Pod(request URL2PodRequest) (resp URL2PodResponse, err error) {
+	resp = URL2PodResponse{ArticleURL: request.URL}
 	resp.Timestamp = request.Timestamp
+
 	article, err := parse.ParseArticle(request.URL)
-	if err {
-		resp.Error = true
-		return resp, true
+	if err != nil {
+		return resp, err
 	}
 	resp.Article = article
+
 	audioResp, err := t2s.Text2SpeechLong(article.Text)
-	if err {
-		resp.Error = true
-		return resp, true
+	if err != nil {
+		return resp, err
 	}
 	resp.Duration = audioResp.Duration
+
 	fileName := b64.StdEncoding.EncodeToString([]byte(request.URL)) + "." + audioResp.FileExtension
-	audioURL := storage.Store(audioResp.AudioBytes, fileName)
+	audioURL, err := storage.Store(audioResp.AudioBytes, fileName)
+	if err != nil {
+		return resp, err
+	}
 	resp.AudioURL = audioURL
 
-	return resp, false
+	return resp, nil
 }
