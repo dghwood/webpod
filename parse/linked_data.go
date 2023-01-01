@@ -3,9 +3,12 @@ package parse
 import (
 	"encoding/json"
 	"errors"
-	"golang.org/x/net/html"
+	"log"
 	"net/http"
+	nurl "net/url"
 	"time"
+
+	"golang.org/x/net/html"
 )
 
 func fetchURL(url string) (doc *html.Node, err error) {
@@ -137,7 +140,7 @@ func faviconCond(n *html.Node) (found bool) {
 	}
 	return a.Val == "icon"
 }
-func getFaviconURL(doc *html.Node) (url string, err error) {
+func getFaviconURL(doc *html.Node, baseURL *nurl.URL) (url string, err error) {
 	n, found := findNode(doc, faviconCond)
 	if !found {
 		return url, errors.New("not found")
@@ -146,5 +149,12 @@ func getFaviconURL(doc *html.Node) (url string, err error) {
 	if !found {
 		return url, errors.New("not found")
 	}
-	return a.Val, nil
+
+	furl, err := nurl.Parse(a.Val)
+	if err != nil {
+		return url, err
+	}
+	log.Println(furl, baseURL)
+	url = baseURL.ResolveReference(furl).String()
+	return url, nil
 }

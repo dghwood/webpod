@@ -13,25 +13,6 @@ import (
 	"cloud.google.com/go/texttospeech/apiv1/texttospeechpb"
 )
 
-func buildRequest(text string) texttospeechpb.SynthesizeSpeechRequest {
-	return texttospeechpb.SynthesizeSpeechRequest{
-		// Set the text input to be synthesized.
-		Input: &texttospeechpb.SynthesisInput{
-			InputSource: &texttospeechpb.SynthesisInput_Text{Text: text},
-		},
-		// Build the voice request, select the language code ("en-US") and the SSML
-		// voice gender ("neutral").
-		Voice: &texttospeechpb.VoiceSelectionParams{
-			LanguageCode: "en-US",
-			SsmlGender:   texttospeechpb.SsmlVoiceGender_NEUTRAL,
-		},
-		// Select the type of audio file you want returned.
-		AudioConfig: &texttospeechpb.AudioConfig{
-			AudioEncoding: texttospeechpb.AudioEncoding_MP3,
-		},
-	}
-}
-
 func buildWAVRequest(text string) texttospeechpb.SynthesizeSpeechRequest {
 	return texttospeechpb.SynthesizeSpeechRequest{
 		// Set the text input to be synthesized.
@@ -49,25 +30,6 @@ func buildWAVRequest(text string) texttospeechpb.SynthesizeSpeechRequest {
 			AudioEncoding: texttospeechpb.AudioEncoding_LINEAR16,
 		},
 	}
-}
-
-func Text2Speech(text string) ([]byte, string, bool) {
-	// Instantiates a client.
-	ctx := context.Background()
-
-	client, err := texttospeech.NewClient(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer client.Close()
-
-	req := buildRequest(text)
-	resp, err := client.SynthesizeSpeech(ctx, &req)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return resp.AudioContent, ".mp3", false
 }
 
 /* Split text by , since that makes sense right? */
@@ -105,6 +67,10 @@ type Text2SpeechResponse struct {
 func Text2SpeechLong(text string) (resp Text2SpeechResponse, err error) {
 	resp = Text2SpeechResponse{}
 
+	if len(text) > 5*5000 {
+		return resp, errors.New("article longer than 15000 chars")
+	}
+
 	// Instantiates a client.
 	ctx := context.Background()
 
@@ -115,8 +81,10 @@ func Text2SpeechLong(text string) (resp Text2SpeechResponse, err error) {
 
 	defer client.Close()
 
-	texts, _ := splitText(text, 5000-1)
-	log.Println("TextSplit #", len(texts))
+	texts, err := splitText(text, 5000-1)
+	if err != nil {
+		return resp, err
+	}
 
 	files := make([]wav.File, len(texts))
 

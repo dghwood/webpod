@@ -48,3 +48,11 @@ func TestNonURL(t *testing.T) {
 		t.Error("Should error out", article)
 	}
 }
+
+func TestURLToB64(t *testing.T) {
+	_, err := urlToDataURL("https://www.economist.com/engassets/ico/touch-icon-180x180.f1ea908894.png")
+	if err != nil {
+		t.Error(err)
+	}
+	//t.Error(dataURL)
+}

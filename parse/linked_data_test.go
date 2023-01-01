@@ -2,6 +2,7 @@ package parse
 
 import (
 	"golang.org/x/net/html"
+	nurl "net/url"
 	"strings"
 	"testing"
 )
@@ -57,4 +58,27 @@ func TestLinkedData(t *testing.T) {
 		t.Error("node is nil")
 	}
 	//t.Error(GetLinkedData(doc))
+}
+
+func TestURLResolve(t *testing.T) {
+	url := "/favicon-48x48.cbbd161b.png"
+	p, _ := nurl.Parse(url)
+	b, _ := nurl.ParseRequestURI("https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch")
+	t.Error(b.ResolveReference(p))
+}
+
+func TestFavicon(t *testing.T) {
+	url := "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch"
+	doc, err := fetchURL(url)
+	if err != nil {
+		t.Error(err)
+	}
+	u, err := nurl.ParseRequestURI(url)
+	furl, err := getFaviconURL(doc, u)
+	if err != nil {
+		t.Error(err)
+	}
+	if furl != "https://developer.mozilla.org/favicon-48x48.cbbd161b.png" {
+		t.Error("furl is wrong")
+	}
 }

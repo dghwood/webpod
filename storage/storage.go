@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-const bucketName = "bsnek-316609.appspot.com"
+const bucketName = "webpods.appspot.com"
 
 func Store(fileBytes []byte, fileName string) (url string, err error) {
 	ctx := context.Background()

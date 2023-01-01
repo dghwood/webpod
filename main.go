@@ -42,22 +42,13 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "/home/dgh_wood/key.json")
+	//os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "/home/dgh_wood/key.json")
 
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
 		port = "8080"
 	}
 
-	// TODO: This is probably insecure
-	/*
-		http.Handle(
-			"/static/",
-			http.StripPrefix("/static/",
-				http.FileServer(http.Dir("./static"))))
-	*/
-
-	//http.HandleFunc("/", HandleIndex)
 	http.HandleFunc("/api/url2pod", HandleURL2Pod)
 
 	log.Printf("Running at http://0.0.0.0:%s...\n", port)

@@ -1,7 +1,7 @@
 # dev_appserver.py --port=8080 app.yaml
 
 # Change this in prod
-runtime: go115  
+runtime: go119  
 
 handlers:
   - url: /static
@@ -9,6 +9,10 @@ handlers:
   
   - url: /api/.* 
     script: auto 
+
+  - url: /service-worker.js
+    static_files: static/js/service-worker.js
+    upload: static/js/service-worker.js
 
   - url: /.*
     static_files: static/index.html

@@ -1,8 +1,11 @@
 package parse
 
 import (
+	b64 "encoding/base64"
 	readability "github.com/go-shiori/go-readability"
+	"io"
 	"log"
+	"net/http"
 	nurl "net/url"
 )
 
@@ -13,6 +16,23 @@ type Article struct {
 	ImageURL string `json:"image_url"`
 	SiteName string `json:"site_name"`
 	Favicon  string `json:"favicon"`
+}
+
+func urlToDataURL(urlString string) (dataURL string, err error) {
+	resp, err := http.Get(urlString)
+	if err != nil {
+		return dataURL, err
+	}
+	defer resp.Body.Close()
+	contentType := resp.Header.Get("Content-Type")
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return dataURL, err
+	}
+	base64Data := b64.StdEncoding.EncodeToString(body)
+
+	dataURL = "data:" + contentType + ";base64," + base64Data
+	return dataURL, nil
 }
 
 func ParseArticle(urlString string) (article Article, err error) {
@@ -40,6 +60,11 @@ func ParseArticle(urlString string) (article Article, err error) {
 		SiteName: rArticle.SiteName,
 	}
 
+	iconURL, err := getFaviconURL(doc, url)
+	if err == nil {
+		article.Favicon = iconURL
+	}
+
 	linkedData := GetLinkedData(doc)
 	for _, ld := range linkedData {
 		if ld.Headline != "" {
@@ -55,13 +80,21 @@ func ParseArticle(urlString string) (article Article, err error) {
 			article.SiteName = ld.Publisher.Name
 		}
 	}
-	iconURL, err := getFaviconURL(doc)
-	if err == nil {
-		article.Favicon = iconURL
-	}
+
 	cURL, err := getCanonicalURL(doc)
 	if err == nil {
 		article.URL = cURL
 	}
+
+	/* download the article images */
+	faviconDURL, err := urlToDataURL(article.Favicon)
+	if err == nil {
+		article.Favicon = faviconDURL
+	}
+	imageDURL, err := urlToDataURL(article.ImageURL)
+	if err == nil {
+		article.ImageURL = imageDURL
+	}
+
 	return article, err
 }
