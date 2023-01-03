@@ -33,12 +33,7 @@ func HandleURL2Pod(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
-	content, err := os.ReadFile("static/index.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-	w.Header().Set("Content-Type", "text/html")
-	w.Write(content)
+	http.Redirect(w, r, "/home", http.StatusFound)
 }
 
 func main() {
@@ -50,6 +45,7 @@ func main() {
 	}
 
 	http.HandleFunc("/api/url2pod", HandleURL2Pod)
+	http.HandleFunc("/", HandleIndex)
 
 	log.Printf("Running at http://0.0.0.0:%s...\n", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

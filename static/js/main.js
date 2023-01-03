@@ -22,11 +22,9 @@ webpod.audio.src = function(pod) {
   if (this._src && this._src.pod_key() == pod.pod_key()) {
     return;
   }
+  this._src = pod; 
   var seconds = pod.seconds();
-  this._element.src = url;
-  /* check the cache 
-     clean this up
-  */
+  
   var reject = function() {
     this._element.src = url;
     this.seek(seconds);
@@ -44,6 +42,18 @@ webpod.audio.src = function(pod) {
 };
 webpod.audio.play = function() {
   this._element.play();
+
+  if (!('mediaSession' in navigator)) {
+    return;
+  }
+  
+  navigator.mediaSession.metadata = new MediaMetadata({
+    'title': this._src.title(),
+    'artist': this._src.name(),
+    'artwork': [
+        { 'src': this._src.image_url() },
+    ]
+  });
 }
 webpod.audio.pause = function() {
   this._element.pause();
@@ -447,10 +457,13 @@ webpod.ui.pods.urlform.showmessage = function(e, x) {
     case 3: document.querySelector('.pod-form-message.loading').classList.remove('hidden'); break;
   }
 };
-webpod.ui.pods.urlform._onsubmit = function(e) {
-  e.preventDefault();
-  var input = e.target.querySelector('input'); 
-  var submit = e.target.querySelector('button[type="submit"]'); 
+webpod.ui.pods.urlform.set_url = function(url) {
+  document.querySelector('.pod-add-form form input').value = url; 
+};
+webpod.ui.pods.urlform.submit = function() {
+  var form = document.querySelector('.pod-add-form form'); 
+  var input = form.querySelector('input'); 
+  var submit = form.querySelector('button[type="submit"]'); 
   submit.setAttribute('disabled', 'disabled'); 
   var url = input.value; 
 
@@ -468,6 +481,10 @@ webpod.ui.pods.urlform._onsubmit = function(e) {
       webpod.ui.pods.urlform._onsubmitfinish();
     }, webpod.ui.pods.urlform._onsubmiterror)
   }, webpod.ui.pods.urlform._onsubmiterror);
+};
+webpod.ui.pods.urlform._onsubmit = function(e) {
+  e.preventDefault();
+  webpod.ui.pods.urlform.submit();
 };
 
 webpod.ui.pods.item = function(pod) {
@@ -727,4 +744,27 @@ webpod.context.player.prototype.ended = function() {
 webpod.ui.pods.list(); 
 document.querySelector('.pod-add')
   .onclick = webpod.ui.pods.urlform.open;
+
+/* Install SW */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+  navigator.serviceWorker.register('/service-worker.js');
+  });
+};
+
+
+/* Handle Incoming Share API */
+// First rediect 
+
+
+window.addEventListener('load', function() {
+  const parsedUrl = new URL(window.location);
+  const url = parsedUrl.hash.split('=') 
+  if (url.length > 1) {
+    this.window.location.href = '#'; // clear the params 
+    webpod.ui.pods.urlform.open(); 
+    webpod.ui.pods.urlform.set_url(decodeURIComponent(url[1])); 
+    webpod.ui.pods.urlform.submit(); 
+  }
+});
 

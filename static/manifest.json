@@ -1,0 +1,29 @@
+{
+  "short_name": "WebPod",
+  "name": "WebPod: Listen to the web",
+  "icons": [
+    {
+      "src": "/static/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ],
+  "id": "/home",
+  "start_url": "/home",
+  "background_color": "#080808",
+  "display": "fullscreen",
+  "scope": "/",
+  "theme_color": "#080808",
+  "description": "Turn articles into podcasts to listen to on the go",
+  "share_target": {
+    "action": "/home",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+  
+}
