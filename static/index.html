@@ -43,25 +43,34 @@
         text-decoration: none;
         color: inherit
       }
+
+      button.share {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        background: none;
+        font-size: 0px;
+        padding: 8px 10px;
+      }
+      button.share .material-symbols-outlined {
+        font-size: 20px;
+      }
     </style>
     <title>WebPod</title>
   </head>
   <body>
     <header>
-      <div class="logo"><a href="#">WebPod</a></div>
+      <div class="logo"><a href="/home#">WebPod</a></div>
+      <button class="hidden share"><span class="material-symbols-outlined">share</span></button>
     </header>
     <views>
       <view id="view-pod-list" >
         <template id="pod-domain-item">
           <div class="pod-domain">
-            <div class="pod-domain-icon">
-
-            </div>
+            <div class="pod-domain-icon"></div>
           </div>
         </template>
-        <section id="pod-domains">
-
-        </section>
+        <section id="pod-domains"></section>
         <template id="pod-list-item">
           <div class="pod">
             <div class="pod-header">
@@ -77,21 +86,17 @@
             </div>
             <div class="pod-footer">
               <div class="pod-actions">
-                <a href="#" class="pod-action play"><span class="material-symbols-outlined">play_circle</span><span class="duration">10 mins</span></a>
-                <a href="#" class="pod-action download"><span class="material-symbols-outlined">download_for_offline</span></a>
-                <a href="#" class="pod-action hidden spinner downloading"><span class="material-symbols-outlined">sync</span></a>
-                <a href="#" class="pod-action hidden undownload"><span class="material-symbols-outlined">check_circle</span></a>
+                <button href="#" class="pod-action play"><span class="material-symbols-outlined">play_circle</span><span class="duration">10 mins</span></button>
+                <button href="#" class="pod-action download"><span class="material-symbols-outlined">download_for_offline</span></button>
+                <button href="#" class="pod-action hidden spinner downloading"><span class="material-symbols-outlined">sync</span></button>
+                <button href="#" class="pod-action hidden undownload"><span class="material-symbols-outlined">check_circle</span></button>
                 <a href="#" target="_blank" class="pod-action open-url"><span class="material-symbols-outlined">open_in_new</span></a>
-                <a href="#" class="pod-action delete"><span class="material-symbols-outlined">delete</span></a>
+                <button href="#" class="pod-action delete"><span class="material-symbols-outlined">delete</span></button>
               </div>
             </div>
           </div>
         </template>
-        <section id="pod-list">
-          
-
-          
-        </section>
+        <section id="pod-list"></section>
         <section id="pod-list-empty" class="hidden">
           <div class="pod-list-empty-header">
             Wow such empty
@@ -100,145 +105,9 @@
             Click the + below and enter an Article URL, we'll transcribe it to a podcast for you so you can listen to it on the go 
           </div>
         </section>
-        <style>
-          #pod-list-empty {
-            padding: 20px;
-            text-align: center;
-          }
-          #pod-list-empty .pod-list-empty-header {
-            font-size: 15px;
-            text-transform: uppercase;
-            font-weight: bold;            
-          }
-          #pod-list-empty .pod-list-empty-body {
-            padding: 10px; 
-
-          }
-
-          body, html {
-            padding: 0px; 
-            margin: 0px; 
-            font-family: monospace;
-          }
-          body {
-            position: absolute;
-            top: 0px;
-            bottom: 0px;
-            left: 0px;
-            right: 0px;
-            overflow: hidden;
-          }
-          header {
-            display: flex;
-            padding: 10px; 
-            background-color: rgb(235, 235, 235); 
-          }
-          header .logo {
-            text-transform: uppercase; 
-            font-size: 1.2em;
-            text-align: center; 
-            flex: auto; 
-          }
-          views {
-            display: block; 
-            _padding: 0px 10px; 
-          }
-          views view {
-            display: block; 
-          }
-          #view-pod-list {
-            position: absolute;
-    width: 100%;
-    height: 100%;
-    overflow: scroll;
-          }
-          #pod-domains {
-            display: flex; 
-            width: 100%; 
-            overflow: hidden; 
-            border-bottom: 1px solid rgb(235, 235, 235);
-          }
-          #pod-domains .pod-domain {
-            display: block; 
-            flex: none;
-            height: 75px; 
-            width: 75px;
-            background-color: rgb(235, 235, 235);
-            margin: 10px;  
-            _background-size: cover;   
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;     
-            box-shadow: 0px 1px 3px rgb(150 150 150);       
-          }
-          #pod-domains .pod-domain .pod-domain-text {
-            text-align: center;
-            width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            bottom: 0px; 
-          }
-          .pod {
-            padding: 10px; 
-            _border-top: 1px solid rgb(235, 235, 235); 
-            border-bottom: 1px solid rgb(235, 235, 235);
-          }
-          .pod .pod-header {
-            display: flex;
-            padding: 5px; 
-          }
-          .pod .pod-header .pod-header-icon {
-            height: 40px; 
-            width: 40px; 
-            margin: 0px 10px; 
-            background-color: rgb(235, 235, 235);
-            _background-size: cover;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-          }
-          .pod .pod-header .pod-header-body {
-            flex: auto; 
-          }
-          .pod .pod-body {
-            margin: 0px 10px; 
-            padding: 5px; 
-          }
-          .pod .pod-body .pod-body-header {
-            font-weight: bold; 
-          }
-          .pod .pod-body .pod-body-text {
-            max-height: 40px; 
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-          }
-          .pod .pod-actions {
-            display: flex; 
-            padding: 5px; 
-          }
-          .pod .pod-actions .pod-action {
-            _background-color: rgb(235, 235, 235); 
-            display: flex;
-            align-items: center;
-            height: 20px;
-            
-            margin: 0px 10px;  
-            text-align: center;
-            font-size: 12px;    
-            color: inherit;
-            text-decoration: none;         
-          }
-          .pod .pod-actions .undownload {
-            color: green; 
-          }
-          .pod .pod-actions .pod-action .material-symbols-outlined {
-            font-size: 20px;
-          }
-        </style>
       </view>
       <view id="view-add-pod">
-        <div class="pod-add"><span class="material-symbols-outlined">add</span></div>
+        <button class="pod-add"><span class="material-symbols-outlined">add</span></button>
         <div class="add-pod-close"></div>
         <div class="pod-add-pop closed">
           <div class="pod-add-form">
@@ -256,125 +125,14 @@
             </div>
           </div>
         </div>
-      </view>
-      <style>
-        .pod-add {
-          position: absolute; 
-          bottom: 100px; 
-          right: 30px;
-          border-radius: 10000px; 
-          background-color: rgb(235, 235, 235); 
-          height: 50px;
-          width: 50px;
-          text-align: center;
-          font-size: 45px;
-        }
-        .add-pod-close {
-          position: absolute;
-          display: none;
-          top: 0px; 
-          bottom: 0px; 
-          left: 0px; 
-          right: 0px;
-          background-color: rgba(12, 12, 12, 0.7);
-        }
-        .pod-add-pop.closed {
-          bottom: -500px;
-        }
-        .pod-add-pop {
-          position: absolute;
-          bottom: 0px;
-          height: 130px;
-          left: 0px;
-          right: 0px;
-          background: white;
-          border-radius: 20px;
-          padding: 20px;
-
-          transition: bottom 0.5s          
-        }
-        .pod-add-pop .pod-add-form {
-          _display: flex;          
-        }
-        .pod-add-pop .pod-add-form form {
-          display: flex;
-          width: 100%;
-        }
-        .pod-add-pop .pod-add-form input {
-          flex: auto;
-        }
-        input {
-          outline: none;
-          border: 1px solid rgb(235, 235, 235);
-          font-family: inherit;
-          border-radius: 2px;
-        }
-        input:focus {
-          border-color: rgb(180, 180, 180);
-        }
-        button {
-          outline: none;
-          background-color: rgb(235, 235, 235);
-          border-radius: 2px;
-          border: none;
-          font-family: inherit;
-          text-transform: uppercase;
-          padding: 7px 20px;
-        }
-
-        
-      </style>
-      <style>
-        .mini-player {
-          display: none; 
-          position: absolute;
-          bottom: 0px;
-          padding: 20px 0px;
-          left: 0px;
-          right: 0px;
-          background: rgb(250, 250, 250);
-          border: 1px solid rgb(235, 235, 235);
-          border-radius: 20px;
-          padding-bottom: 0px;
-        }
-        .mini-player .mini-player-wrapper {
-          display: flex; 
-        }
-        .mini-player .mini-player-icon {
-          background-size: cover;
-    height: 50px;
-    width: 50px;
-    min-width: 50px;
-        }
-        .mini-player .mini-player-title {
-          flex: auto;
-    padding: 0px 10px;
-        }
-        .mini-player .mini-player-duration {
-          height: 5px;
-    width: 50%;
-    background: #1976D2;
-        }
-        .mini-player .mini-player-action {
-          width: 50px;
-    height: 25px;
-    font-size: 25px;
-    text-decoration: none;
-    color: inherit;
-    min-width: 50px;
-    text-align: center;
-        }
-        .mini-player .mini-player-play {
-          display: none;
-        }
-      </style>
+      </view> 
       <view id="view-pod-play">
         <div class="mini-player">
           <div class="mini-player-wrapper">
             <div class="mini-player-icon"></div>
             <div class="mini-player-title"></div>
-            <a href="#" class="mini-player-action mini-player-play material-symbols-outlined">play_arrow</a>
-            <a href="#" class="mini-player-action mini-player-pause material-symbols-outlined">pause</a>
+            <button href="#" class="mini-player-action mini-player-play material-symbols-outlined">play_arrow</button>
+            <button href="#" class="mini-player-action mini-player-pause material-symbols-outlined">pause</button>
           </div>
           <div class="mini-player-duration"></div>
         </div>
@@ -391,91 +149,368 @@
             <audio controls crossorigin="anonymous"></audio>
           </div>
         </div>
-      </view>
-      <style>
-        #_view-pod-play {
-          display: none;
-          position: absolute; 
-          bottom: 0px; 
-          top: 0px; 
-          left: 0px; 
-          right: 0px;  
-          background-color: rgba(12, 12, 12, 0.6);
-        }
-        #view-pod-play .player-close{
-          position: absolute;
-          display: none;
-          top: 0px; 
-          bottom: 0px; 
-          left: 0px; 
-          right: 0px;
-          background-color: rgba(12, 12, 12, 0.7);
-        }
-        #view-pod-play .player {
-          position: absolute;
-          bottom: 0px;
-          height: 500px;
-          left: 0px;
-          right: 0px;
-          background: white;
-          border-radius: 20px;
-          padding: 20px;
-
-          transition: bottom 0.5s
-        }
-        #view-pod-play .player.close {
-          bottom: -600px;
-        }
-        #view-pod-play .player .player-image {
-          padding: 10px;
-          background-color: rgb(235, 235, 235);
-          height: 300px;
-          margin: auto;
-          background-size: cover;
-          border-radius: 10px;
-        }
-        #view-pod-play .player .player-header {
-          display: flex; 
-          margin: 10px 0px;
-          align-items: center;
-        }
-        #view-pod-play .player .player-header .player-header-title {
-          flex: auto; 
-          padding: 0px 10px; 
-        }
-        #view-pod-play .player .player-header .player-header-icon {
-          padding: 10px; 
-          width: 40px; 
-          height: 40px; 
-          background-color: rgb(235, 235, 235);
-          background-size: cover; 
-          min-width: 40px;
-        }
-        #view-pod-play .player .player-controls {
-          text-align: center;
-          padding-top: 20px;
-        }
-        #view-pod-play .player .player-controls audio {
-          width: 100%;
-        }
-
-        .error-message {
-          position: absolute; 
-          bottom: 10px; 
-          left: 10px; 
-          padding: 20px; 
-          background: rgb(8, 8, 8); 
-          color: rgb(235, 235, 235); 
-          border-radius: 10px;
-          max-width: 250px;
-        }
-      </style>
-      
+      </view>     
     </views>
+
     <div class="error-message hidden">
       <span class="error-title">ERROR: </span>
       <span class="error-text">Not connected to internet Not connected to internet Not connected to internet Not connected to internet</span>
     </div>
   </body>
   <script src="/static/js/main.js"></script>
+  <style>
+    #pod-list-empty {
+      padding: 20px;
+      text-align: center;
+    }
+    #pod-list-empty .pod-list-empty-header {
+      font-size: 15px;
+      text-transform: uppercase;
+      font-weight: bold;            
+    }
+    #pod-list-empty .pod-list-empty-body {
+      padding: 10px; 
+
+    }
+
+    body, html {
+      padding: 0px; 
+      margin: 0px; 
+      font-family: monospace;
+    }
+    body {
+      position: absolute;
+      top: 0px;
+      bottom: 0px;
+      left: 0px;
+      right: 0px;
+      overflow: hidden;
+    }
+    header {
+      display: flex;
+      padding: 10px; 
+      background-color: rgb(235, 235, 235); 
+      position: relative;
+    }
+    header .logo {
+      text-transform: uppercase; 
+      font-size: 1.2em;
+      text-align: center; 
+      flex: auto; 
+    }
+    views {
+      display: block; 
+      _padding: 0px 10px; 
+    }
+    views view {
+      display: block; 
+    }
+    #view-pod-list {
+      position: absolute;
+width: 100%;
+height: 100%;
+overflow: scroll;
+    }
+    #pod-domains {
+      display: flex; 
+      width: 100%; 
+      overflow: hidden; 
+      border-bottom: 1px solid rgb(235, 235, 235);
+      overflow-x: scroll;
+    }
+    #pod-domains::-webkit-scrollbar {
+      display: none;
+    }
+    #pod-domains .pod-domain {
+      display: block; 
+      flex: none;
+      height: 75px; 
+      width: 75px;
+      background-color: rgb(235, 235, 235);
+      margin: 10px;  
+      _background-size: cover;   
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;     
+      box-shadow: 0px 1px 3px rgb(150 150 150);       
+    }
+    #pod-domains .pod-domain .pod-domain-text {
+      text-align: center;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      bottom: 0px; 
+    }
+    .pod {
+      padding: 10px; 
+      _border-top: 1px solid rgb(235, 235, 235); 
+      border-bottom: 1px solid rgb(235, 235, 235);
+    }
+    .pod .pod-header {
+      display: flex;
+      padding: 5px; 
+    }
+    .pod .pod-header .pod-header-icon {
+      height: 40px; 
+      width: 40px; 
+      margin: 0px 10px; 
+      background-color: rgb(235, 235, 235);
+      _background-size: cover;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    .pod .pod-header .pod-header-body {
+      flex: auto; 
+    }
+    .pod .pod-body {
+      margin: 0px 10px; 
+      padding: 5px; 
+    }
+    .pod .pod-body .pod-body-header {
+      font-weight: bold; 
+    }
+    .pod .pod-body .pod-body-text {
+      max-height: 40px; 
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .pod .pod-actions {
+      display: flex; 
+      padding: 5px; 
+    }
+    .pod .pod-actions .pod-action {
+      _background-color: rgb(235, 235, 235); 
+      display: flex;
+      align-items: center;
+      height: 20px;
+      
+      margin: 0px 10px;  
+      text-align: center;
+      font-size: 12px;    
+      color: inherit;
+      text-decoration: none;         
+    }
+    .pod .pod-actions button.pod-action {
+      /* fix this, since overridding button css */
+      padding: 0px;
+      background: none;
+      text-transform: none;
+    }
+    .pod .pod-actions .undownload {
+      color: green; 
+    }
+    .pod .pod-actions .pod-action .material-symbols-outlined {
+      font-size: 20px;
+    }
+  </style>
+  <style>
+    button.pod-add {
+      position: absolute; 
+      bottom: 100px; 
+      right: 30px;
+      border-radius: 10000px; 
+      background-color: rgb(235, 235, 235); 
+      height: 50px;
+      width: 50px;
+      text-align: center;
+      font-size: 45px;
+      padding: 0px;
+      display: flex; 
+      align-items: center; 
+    }
+    button.pod-add span {
+      flex: auto; 
+    }
+    .add-pod-close {
+      position: absolute;
+      display: none;
+      top: 0px; 
+      bottom: 0px; 
+      left: 0px; 
+      right: 0px;
+      background-color: rgba(12, 12, 12, 0.7);
+    }
+    .pod-add-pop.closed {
+      bottom: -500px;
+    }
+    .pod-add-pop {
+      position: absolute;
+      bottom: 0px;
+      height: 130px;
+      left: 0px;
+      right: 0px;
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+
+      transition: bottom 0.5s          
+    }
+    .pod-add-pop .pod-add-form {
+      _display: flex;          
+    }
+    .pod-add-pop .pod-add-form form {
+      display: flex;
+      width: 100%;
+    }
+    .pod-add-pop .pod-add-form input {
+      flex: auto;
+    }
+    input {
+      outline: none;
+      border: 1px solid rgb(235, 235, 235);
+      font-family: inherit;
+      border-radius: 2px;
+    }
+    input:focus {
+      border-color: rgb(180, 180, 180);
+    }
+    button {
+      outline: none;
+      background-color: rgb(235, 235, 235);
+      border-radius: 2px;
+      border: none;
+      font-family: inherit;
+      text-transform: uppercase;
+      padding: 7px 20px;
+    }
+
+    
+  </style>
+  <style>
+    .mini-player {
+      display: none; 
+      position: absolute;
+      bottom: 0px;
+      _padding: 20px 0px;
+      left: 0px;
+      right: 0px;
+      background: rgb(250, 250, 250);
+      border: 1px solid rgb(235, 235, 235);
+      border-radius: 20px;
+      padding-bottom: 0px;
+    }
+    .mini-player .mini-player-wrapper {
+      display: flex; 
+      padding: 5px;
+      align-items: center;
+    }
+    .mini-player .mini-player-icon {
+      background-size: cover;
+      
+      height: 50px;
+      width: 50px;
+      min-width: 50px;
+      border-radius: 5px;
+    }
+    .mini-player .mini-player-title {
+      flex: auto;
+      padding: 0px 10px;
+    }
+    .mini-player .mini-player-duration {
+      height: 5px;
+      width: 50%;
+      background: #1976D2;
+    }
+    .mini-player .mini-player-action {
+      width: 50px;
+      height: 25px;
+      font-size: 25px;
+      text-decoration: none;
+      color: inherit;
+      min-width: 50px;
+      text-align: center;
+    }
+    .mini-player button.mini-player-action {
+      /* fix this, since overridding button css */
+      padding: 0px;
+      background: none;
+      text-transform: none;
+    }
+    .mini-player .mini-player-play {
+      display: none;
+    }
+  </style>
+  <style>
+    #_view-pod-play {
+      display: none;
+      position: absolute; 
+      bottom: 0px; 
+      top: 0px; 
+      left: 0px; 
+      right: 0px;  
+      background-color: rgba(12, 12, 12, 0.6);
+    }
+    #view-pod-play .player-close{
+      position: absolute;
+      display: none;
+      top: 0px; 
+      bottom: 0px; 
+      left: 0px; 
+      right: 0px;
+      background-color: rgba(12, 12, 12, 0.7);
+    }
+    #view-pod-play .player {
+      position: absolute;
+      bottom: 0px;
+      height: 500px;
+      left: 0px;
+      right: 0px;
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+
+      transition: bottom 0.5s
+    }
+    #view-pod-play .player.close {
+      bottom: -600px;
+    }
+    #view-pod-play .player .player-image {
+      padding: 10px;
+      background-color: rgb(235, 235, 235);
+      height: 300px;
+      margin: auto;
+      background-size: cover;
+      border-radius: 10px;
+    }
+    #view-pod-play .player .player-header {
+      display: flex; 
+      margin: 10px 0px;
+      align-items: center;
+    }
+    #view-pod-play .player .player-header .player-header-title {
+      flex: auto; 
+      padding: 0px 10px; 
+    }
+    #view-pod-play .player .player-header .player-header-icon {
+      padding: 10px; 
+      width: 40px; 
+      height: 40px; 
+      background-color: rgb(235, 235, 235);
+      background-size: contain;
+      background-position: center; 
+      background-repeat: no-repeat; 
+      min-width: 40px;
+    }
+    #view-pod-play .player .player-controls {
+      text-align: center;
+      padding-top: 20px;
+    }
+    #view-pod-play .player .player-controls audio {
+      width: 100%;
+    }
+
+    .error-message {
+      position: absolute; 
+      bottom: 10px; 
+      left: 10px; 
+      padding: 20px; 
+      background: rgb(8, 8, 8); 
+      color: rgb(235, 235, 235); 
+      border-radius: 10px;
+      max-width: 250px;
+    }
+  </style>
+  
 </html>

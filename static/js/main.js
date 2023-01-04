@@ -739,7 +739,6 @@ webpod.context.player.prototype.ended = function() {
 };
 
 
-
 /* MAIN */ 
 webpod.ui.pods.list(); 
 document.querySelector('.pod-add')
@@ -755,11 +754,22 @@ if ('serviceWorker' in navigator) {
 
 /* Handle Incoming Share API */
 // First rediect 
+void function() {
+  const parsedUrl = new URL(window.location);
+  const params = ['url', 'text', 'title'];
+  for (var i = 0; i < params.length; i++) {
+    var url = parsedUrl.searchParams.get(params[i]);
+    if (url && url.startsWith('http')) {
+      window.location.href = '/home#url=' + encodeURIComponent(url);
+      break;
+    }
+  }
+}();
 
 
 window.addEventListener('load', function() {
   const parsedUrl = new URL(window.location);
-  const url = parsedUrl.hash.split('=') 
+  const url = parsedUrl.hash.split('url=') 
   if (url.length > 1) {
     this.window.location.href = '#'; // clear the params 
     webpod.ui.pods.urlform.open(); 
@@ -767,4 +777,22 @@ window.addEventListener('load', function() {
     webpod.ui.pods.urlform.submit(); 
   }
 });
+
+/* share */ 
+void function() {
+  if (!navigator.share) {
+    return;
+  }
+  const share = document.querySelector('.share')
+  share.classList.remove('hidden'); 
+  share.onclick = function() {
+    navigator.share({
+      title: 'webpod.app',
+      text: 'Listen to the web.',
+      url: 'https://webpod.app',
+    })
+      .then(() => console.log('Successful share'))
+      .catch((error) => console.log('Error sharing', error));
+  }
+}();
 
