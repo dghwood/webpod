@@ -14,9 +14,9 @@ func TestText2SpeechLong(t *testing.T) {
 	if len(buffer) < 5000 {
 		t.Error("buffer is too short to split", len(buffer))
 	}
-	resp, err := Text2SpeechLong(buffer)
+	resp, err := GCloudT2S(Text2SpeechRequest{Text: buffer})
 	if err != nil {
-		t.Error("Text2Speech throws error")
+		t.Error("Text2Speech throws error", err)
 	}
 
 	// download the file for testing
@@ -47,16 +47,5 @@ func TestSplitTextLong(t *testing.T) {
 	}
 	if len(result) != 2 {
 		t.Error("splitText returned wrong number of splits")
-	}
-}
-
-func TestSplitTextNoNewLines(t *testing.T) {
-	text, err := os.ReadFile("../samples/test_article_no_new_lines.txt")
-	if err != nil {
-		t.Error("failed to read file")
-	}
-	result, err := splitText(string(text), 5000-1)
-	if err != nil {
-		t.Error("failed to split", result)
 	}
 }

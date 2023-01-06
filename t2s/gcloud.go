@@ -1,38 +1,44 @@
 package t2s
 
 import (
-	"context"
-	"errors"
-
-	wav "github.com/moutend/go-wav"
-	"io"
-	"log"
-	"strings"
-
 	texttospeech "cloud.google.com/go/texttospeech/apiv1"
 	"cloud.google.com/go/texttospeech/apiv1/texttospeechpb"
+	"context"
+	"errors"
+	wav "github.com/dghwood/goaudio/wav"
+	"strings"
 )
 
-func buildWAVRequest(text string) texttospeechpb.SynthesizeSpeechRequest {
-	return texttospeechpb.SynthesizeSpeechRequest{
-		// Set the text input to be synthesized.
+func buildWAVRequest(req Text2SpeechRequest) (pb texttospeechpb.SynthesizeSpeechRequest) {
+	// Populate defaults
+	if req.LanguageCode == "" {
+		req.LanguageCode = "en-US"
+	}
+
+	pb = texttospeechpb.SynthesizeSpeechRequest{
 		Input: &texttospeechpb.SynthesisInput{
-			InputSource: &texttospeechpb.SynthesisInput_Text{Text: text},
+			InputSource: &texttospeechpb.SynthesisInput_Text{Text: req.Text},
 		},
-		// Build the voice request, select the language code ("en-US") and the SSML
-		// voice gender ("neutral").
 		Voice: &texttospeechpb.VoiceSelectionParams{
-			LanguageCode: "en-US",
+			LanguageCode: req.LanguageCode,
 			SsmlGender:   texttospeechpb.SsmlVoiceGender_NEUTRAL,
 		},
-		// Select the type of audio file you want returned.
 		AudioConfig: &texttospeechpb.AudioConfig{
-			AudioEncoding: texttospeechpb.AudioEncoding_LINEAR16,
+			AudioEncoding: texttospeechpb.AudioEncoding_LINEAR16, // WAV Format
 		},
 	}
+	// Set Voice if there is one
+	if req.Voice != "" {
+		pb.Voice.Name = req.Voice
+	}
+	return
 }
 
-/* Split text by , since that makes sense right? */
+/*
+	 Given the Cloud T2S API has a hard limit of 5000 characters
+		 This function splits the text into batches of below 5000 characters
+		 TODO: Does "," make sense as a splitter character?
+*/
 const splitChar = ","
 
 func splitText(text string, limit int) ([]string, error) {
@@ -51,22 +57,15 @@ func splitText(text string, limit int) ([]string, error) {
 		}
 	}
 	if len(buffer) > limit {
-		log.Println("text unable to be split into requests")
 		return nil, errors.New("text unable to be split into requests")
 	}
 	returnStrings = append(returnStrings, buffer)
 	return returnStrings, nil
 }
 
-type Text2SpeechResponse struct {
-	Duration      float32
-	FileExtension string
-	AudioBytes    []byte
-}
-
-func Text2SpeechLong(text string) (resp Text2SpeechResponse, err error) {
+func GCloudT2S(req Text2SpeechRequest) (resp Text2SpeechResponse, err error) {
 	resp = Text2SpeechResponse{}
-
+	text := req.Text
 	if len(text) > 5*5000 {
 		return resp, errors.New("article longer than 15000 chars")
 	}
@@ -86,30 +85,34 @@ func Text2SpeechLong(text string) (resp Text2SpeechResponse, err error) {
 		return resp, err
 	}
 
-	files := make([]wav.File, len(texts))
+	files := make([][]byte, len(texts))
 
 	// Run each text piece via T2S
-	// do this concurrently
+	// TODO: Do this concurrently?
 	for i := 0; i < len(texts); i++ {
-		log.Println("T2S for text:", len(texts[i]))
-		req := buildWAVRequest(texts[i])
+		t2sreq := req
+		t2sreq.Text = texts[i]
+		req := buildWAVRequest(t2sreq)
 		r, err := client.SynthesizeSpeech(ctx, &req)
 		if err != nil {
 			return resp, err
 		}
-		wav.Unmarshal(r.AudioContent, &files[i])
+		files[i] = r.AudioContent
 	}
+
 	// Then concat the files into one
-	content, _ := wav.New(files[0].SamplesPerSec(), files[0].BitsPerSample(), files[0].Channels())
-	for i := 0; i < len(texts); i++ {
-		io.Copy(content, &files[i])
+	wavFile, err := wav.FromBytes(files[0])
+	if err != nil {
+		return resp, err
+	}
+	for i := 1; i < len(texts); i++ {
+		wavFile.AppendBytes(files[i])
 	}
 	resp.FileExtension = "wav"
 
-	audioContent, _ := wav.Marshal(content)
+	audioContent, _ := wavFile.Bytes()
 	resp.AudioBytes = audioContent
-	// built in content.Duration is broken
-	duration := float32(content.Length()) * 1. / float32(content.BlockAlign()) * 1. / float32(content.SamplesPerSec())
+	duration := wavFile.Seconds()
 	resp.Duration = duration
 	return resp, nil
 }

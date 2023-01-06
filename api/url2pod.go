@@ -18,7 +18,7 @@ type URL2PodResponse struct {
 	ArticleURL string        `json:"article_url"`
 	Article    parse.Article `json:"article"`
 	AudioURL   string        `json:"audio_url"`
-	Duration   float32       `json:"duration"`
+	Duration   float64       `json:"duration"`
 }
 
 func URL2Pod(request URL2PodRequest) (resp URL2PodResponse, err error) {
@@ -31,7 +31,7 @@ func URL2Pod(request URL2PodRequest) (resp URL2PodResponse, err error) {
 	}
 	resp.Article = article
 
-	audioResp, err := t2s.Text2SpeechLong(article.Text)
+	audioResp, err := t2s.Text2Speech(t2s.Text2SpeechRequest{Text: article.Text})
 	if err != nil {
 		return resp, err
 	}
