@@ -1,12 +1,13 @@
+/* Main Parser for Web Articles */
 package parse
 
 import (
 	b64 "encoding/base64"
+	"github.com/dghwood/webpod/fetch"
+	"github.com/dghwood/webpod/html"
 	readability "github.com/go-shiori/go-readability"
 	"io"
-	"log"
 	"net/http"
-	nurl "net/url"
 )
 
 type Article struct {
@@ -18,32 +19,17 @@ type Article struct {
 	Favicon  string `json:"favicon"`
 }
 
-func urlToDataURL(urlString string) (dataURL string, err error) {
-	resp, err := http.Get(urlString)
-	if err != nil {
-		return dataURL, err
-	}
-	defer resp.Body.Close()
-	contentType := resp.Header.Get("Content-Type")
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return dataURL, err
-	}
-	base64Data := b64.StdEncoding.EncodeToString(body)
+/*
+	 Main parser for articles
 
-	dataURL = "data:" + contentType + ";base64," + base64Data
-	return dataURL, nil
-}
-
+	  * Check the URL is valid
+		* Request the URL
+		* Parse article text
+		* Parse article meta
+		* Parse some domain meta
+*/
 func ParseArticle(urlString string) (article Article, err error) {
-	log.Println("parse article")
-	url, err := nurl.ParseRequestURI(urlString)
-	if err != nil {
-		log.Println("not a URL")
-		return article, err
-	}
-	log.Println(url)
-	doc, err := fetchURL(urlString)
+	doc, url, err := fetch.FetchDoc(urlString)
 	if err != nil {
 		return article, err
 	}
@@ -60,12 +46,12 @@ func ParseArticle(urlString string) (article Article, err error) {
 		SiteName: rArticle.SiteName,
 	}
 
-	iconURL, err := getFaviconURL(doc, url)
+	iconURL, err := html.GetFaviconURL(doc, url)
 	if err == nil {
 		article.Favicon = iconURL
 	}
 
-	linkedData := GetLinkedData(doc)
+	linkedData := html.GetLinkedData(doc)
 	for _, ld := range linkedData {
 		if ld.Headline != "" {
 			article.Title = ld.Headline
@@ -81,7 +67,7 @@ func ParseArticle(urlString string) (article Article, err error) {
 		}
 	}
 
-	cURL, err := getCanonicalURL(doc)
+	cURL, err := html.GetCanonicalURL(doc)
 	if err == nil {
 		article.URL = cURL
 	}
@@ -97,4 +83,22 @@ func ParseArticle(urlString string) (article Article, err error) {
 	}
 
 	return article, err
+}
+
+/* This is used to cache images embedded in the article */
+func urlToDataURL(urlString string) (dataURL string, err error) {
+	resp, err := http.Get(urlString)
+	if err != nil {
+		return dataURL, err
+	}
+	defer resp.Body.Close()
+	contentType := resp.Header.Get("Content-Type")
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return dataURL, err
+	}
+	base64Data := b64.StdEncoding.EncodeToString(body)
+
+	dataURL = "data:" + contentType + ";base64," + base64Data
+	return dataURL, nil
 }
